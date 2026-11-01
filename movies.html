@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechFlix | TV Shows</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #8a2be2;
+            --secondary: #00bfff;
+            --dark: #0f0c29;
+            --darker: #090617;
+            --light: #f5f5f5;
+            --card-bg: rgba(25, 20, 60, 0.7);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        body {
+            background: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Galaxy Background */
+        .galaxy-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 5s) infinite var(--delay, 0s);
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .nebula {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(30px);
+            animation: float 30s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(100px, 150px) rotate(90deg);
+            }
+            50% {
+                transform: translate(200px, 0) rotate(180deg);
+            }
+            75% {
+                transform: translate(100px, -150px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background 0.3s ease;
+        }
+
+        .header.scrolled {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+            transition: 0.3s;
+        }
+
+        nav a {
+            color: #ddd;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+
+        nav a:hover,
+        nav a.active {
+            background: rgba(106, 90, 249, 0.3);
+            color: #fff;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 150px;
+        }
+
+        .search-bar input::placeholder {
+            color: #aaa;
+        }
+
+        .notification,
+        .user-icon {
+            background: rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notification::after {
+            content: "3";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+
+        /* Video Player Section */
+        .player-container {
+            max-width: 1800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgb(104, 79, 233);
+            background: #292828a6;
+            -webkit-mask-image: radial-gradient(103% 15% at 50% 103%, #0000 50%, rgb(48, 42, 42) 52%);
+            height: 600px;
+            border: 0.1rem solid #9f428d54;
+        }
+
+        #main-video {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16/9;
+        }
+
+        .player-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .video-wrapper:hover .player-controls {
+            opacity: 1;
+        }
+
+        .play-pause {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 30%;
+            background: var(--gradient);
+            border-radius: 3px;
+        }
+
+        .time-display {
+            color: white;
+            font-size: 0.9rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 120px;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .volume-level {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 80%;
+            background: var(--gradient);
+            border-radius: 3px;
+        }
+
+        .fullscreen-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* Video Info */
+        .video-info {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(25, 20, 60, 0.5);
+            border-radius: 15px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            -webkit-mask-image: radial-gradient(103% 15% at 50% 103%, transparent 50%, rgb(97, 82, 82) 52%);
+        }
+
+        .video-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #fff, #d9e3f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .video-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .video-meta .rating {
+            color: #f5c518;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .video-description {
+            color: #bbb;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--light);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+
+        /* Watchlist notification */
+        .watchlist-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(25, 20, 60, 0.9);
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .watchlist-notification.show {
+            transform: translateX(0);
+        }
+
+        /* Download overlay */
+        .download-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .download-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .download-container {
+            background: rgba(25, 20, 60, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--primary);
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+        }
+
+        .download-container h2 {
+            margin-bottom: 20px;
+            color: var(--light);
+            font-size: 1.8rem;
+        }
+
+        .download-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .download-option {
+            background: rgba(138, 43, 226, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            width: 120px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .download-option:hover {
+            background: rgba(138, 43, 226, 0.3);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .download-option i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .download-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #bbb;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .download-close:hover {
+            color: var(--light);
+        }
+
+        /* Auto Slider */
+        .auto-slider-container {
+            position: relative;
+            height: 300px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 50px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .auto-slider {
+            display: flex;
+            height: 100%;
+            transition: transform 1s ease-in-out;
+        }
+
+        .auto-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auto-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .auto-slide-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 50px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .auto-slide h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #d9e3f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auto-slide p {
+            font-size: 1.2rem;
+            color: #bbb;
+            margin-bottom: 30px;
+        }
+
+        /* Related Videos */
+        .related-section {
+            margin: 60px 0 40px;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            padding: 10px 0;
+        }
+
+        .videos-slider {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s ease;
+            padding: 10px 0;
+        }
+
+        .slider-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .slider-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .slider-btn:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .video-card {
+            max-width: 252px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            background: var(--card-bg);
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            cursor: pointer;
+            height: 400px;
+        }
+
+        .video-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(138, 43, 226, 0.3);
+            z-index: 2;
+            border-color: var(--primary);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .video-card:hover .card-img {
+            transform: scale(1.1);
+        }
+
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(15, 12, 41, 0.9) 0%, transparent 100%);
+            padding: 20px;
+        }
+
+        .card-overlay h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .card-overlay .info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .card-overlay .rating {
+            color: #f5c518;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 12, 41, 0.9);
+            padding: 60px 50px 30px;
+            margin-top: 70px;
+            border-top: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            background: var(--gradient);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(138, 43, 226, 0.3);
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1100px) {
+            .video-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            header {
+                padding: 15px 30px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            nav {
+                width: 100%;
+                order: 3;
+                display: none;
+                transition: height 0.3s ease;
+            }
+
+            nav.active {
+                display: block;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+                background: rgba(0, 0, 0, 0.7);
+                padding: 15px;
+                border-radius: 10px;
+            }
+
+            .user-actions {
+                order: 2;
+                margin-left: auto;
+            }
+
+            .video-title {
+                font-size: 1.8rem;
+            }
+
+            .player-controls {
+                flex-wrap: wrap;
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .volume-container {
+                width: 100px;
+            }
+
+            .auto-slide h2 {
+                font-size: 2rem;
+            }
+            
+            .download-options {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .video-title {
+                font-size: 1.6rem;
+            }
+
+            .video-meta {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .action-buttons {
+                flex-wrap: wrap;
+            }
+
+            .section-title {
+                font-size: 1.6rem;
+            }
+
+            .auto-slide h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .video-card {
+                min-width: 250px;
+            }
+
+            .video-title {
+                font-size: 1.5rem;
+            }
+
+            .video-meta {
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+
+            .auto-slide h2 {
+                font-size: 1.5rem;
+            }
+
+            .auto-slide p {
+                font-size: 1rem;
+            }
+            
+            .video-wrapper {
+                height: 400px;
+            }
+        }
+
+        .slide-track {
+            display: flex;
+            width: calc(2050px * 18);
+            animation: scroll 50s linear infinite;
+
+        }
+
+        .slide-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(calc(-250px * 9));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="galaxy-bg" id="galaxy"></div>
+    
+    <!-- Watchlist notification -->
+    <div class="watchlist-notification" id="watchlistNotification">
+        <i class="fas fa-check-circle"></i>
+        <span>Added to Watchlist!</span>
+    </div>
+    
+    <!-- Download overlay -->
+    <div class="download-overlay" id="downloadOverlay">
+        <div class="download-container">
+            <button class="download-close" id="closeDownload">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2>Download Options</h2>
+            <p>Choose your preferred download quality</p>
+            <div class="download-options">
+                <div class="download-option" data-quality="720p">
+                    <i class="fas fa-hd"></i>
+                    <div>720p HD</div>
+                    <small>1.2 GB</small>
+                </div>
+                <div class="download-option" data-quality="1080p">
+                    <i class="fas fa-film"></i>
+                    <div>1080p Full HD</div>
+                    <small>2.5 GB</small>
+                </div>
+                <div class="download-option" data-quality="4k">
+                    <i class="fas fa-video"></i>
+                    <div>4K Ultra HD</div>
+                    <small>6.8 GB</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header id="header">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-play-circle"></i></div>
+            <div class="logo-text"><a href="index.html">TechFlix</a></div>
+        </div>
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <nav id="navMenu">
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="Browse.html">Browse</a></li>
+                <li><a href="movies.html" class="active">Movies</a></li>
+                <li><a href="tvshows.html">TV Shows</a></li>
+                <li><a href="kids.html">Kids</a></li>
+                <li><a href="Profile.html">Profile</a></li>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="notification">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-icon">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="PS"
+                    style="height: 40px; width: 40px; border-radius: 50%; border: 0.1rem solid #ff00cc;">
+            </div>
+        </div>
+    </header>
+
+    <div class="player-container">
+        <div class="video-wrapper">
+            <video id="main-video" poster="./img/bhoolbhulayaa2-b.webp">
+                <source src="./img/vide-v10.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="player-controls">
+                <div class="play-pause" id="play-pause">
+                    <i class="fas fa-play"></i>
+                </div>
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="time-display" id="time-display">00:00 / 00:00</div>
+                <div class="volume-container">
+                    <i class="fas fa-volume-up"></i>
+                    <div class="volume-slider" id="volume-slider">
+                        <div class="volume-level" id="volume-level"></div>
+                    </div>
+                </div>
+                <button class="fullscreen-btn" id="fullscreen-btn">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="video-info">
+            <h1 class="video-title">Bhool Bhulaiyaa 2</h1>
+            <div class="video-meta">
+                <span>2022</span>
+                <span>Comedy Adventure</span>
+                <span class="rating"><i class="fas fa-star"></i> 6.7/10</span>
+                <span>1h 52m</span>
+            </div>
+            <p class="video-description">
+                When strangers Reet and Ruhan cross paths, their journey leads to an abandoned mansion and a dreaded
+                spirit who has been trapped for 18 years.<br> Starring: Tabu, Kartik Aaryan, and Kiara Advani
+            </p>
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="watchlistBtn">
+                    <i class="fas fa-plus"></i> Add to Watchlist
+                </button>
+                <button class="btn btn-outline">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+                <button class="btn btn-outline" id="downloadBtn">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+        </div>
+    </div>
+
+<!-- Related - Section -->
+    <div class="related-section">
+        <h2 class="section-title"><i class="fas fa-film"></i> Related Videos</h2>
+        <div class="slider-container">
+            <div class="videos-slider" id="videos-slider">
+                <div class="video-card">
+                    <div class="card-img"><img src="./img/1920-v.webp" alt="1920"></div>
+                    <div class="card-overlay">
+                        <h3>1920</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.2</span>
+                            <span>2022</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card">
+                    <div class="card-img"><img src="./img/horra.webp" alt="Possession"></div>
+                    <div class="card-overlay">
+                        <h3>Possession Hannah Grace</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.9</span>
+                            <span>2021</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card">
+                    <div class="card-img"><img src="./img/chandrmukhi2.webp" alt="chandrmukhi2"></div>
+                    <div class="card-overlay">
+                        <h3>ChandrM mukhi 2</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 7.8</span>
+                            <span>2025</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card">
+                    <div class="card-img"><img src="./img/annabelle.webp" alt="annabelle"></div>
+                    <div class="card-overlay">
+                        <h3>Annabelle</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.5</span>
+                            <span>2022</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="video-card">
+                    <div class="card-img"><img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="dsp"></div>
+                    <div class="card-overlay">
+                        <h3>Nanna</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 9.0</span>
+                            <span>2025</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="video-card">
+                    <div class="card-img"><img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="dsp"></div>
+                    <div class="card-overlay">
+                        <h3>Malaal</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 9.0</span>
+                            <span>2025</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="video-card">
+                    <div class="card-img"><img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="dsp"></div>
+                    <div class="card-overlay">
+                        <h3>Sikandar</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 9.0</span>
+                            <span>2025</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="video-card">
+                    <div class="card-img"><img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="dsp"></div>
+                    <div class="card-overlay">
+                        <h3>T & F</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 9.0</span>
+                            <span>2025</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card">
+                    <div class="card-img"><img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" alt="dsp"></div>
+                    <div class="card-overlay">
+                        <h3>Raees</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.7</span>
+                            <span>2022</span>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+            <div class="slider-controls">
+                <button class="slider-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+                <button class="slider-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+<!-- Sldes - TiTle -->
+    
+    <div class="auto-slider-container">
+        <div class="auto-slider" id="auto-slider">
+            <div class="auto-slide"
+                style="background: linear-gradient(rgba(0, 0, 0, 0.303), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1500&q=80')); background-size: cover; background-position: center;">
+                <div class="auto-slide-content">
+                    <h2>New Episodes Every Friday</h2>
+                    <p>Don't miss the latest episodes of your favorite shows. Available exclusively on CosmicFlix.</p>
+                    <button class="btn btn-primary">View Schedule</button>
+                </div>
+            </div>
+            <div class="auto-slide"
+                style="background: linear-gradient(rgba(0,0,0,0.5), url('https://images.unsplash.com/photo-1535016120720-40c646be5580?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1500&q=80')); background-size: cover; background-position: center;">
+                <div class="auto-slide-content">
+                    <h2>Binge-Worthy Series</h2>
+                    <p>Discover our collection of complete series ready for your next binge-watching session.</p>
+                    <button class="btn btn-primary">Explore Series</button>
+                </div>
+            </div>
+            <div class="auto-slide"
+                style="background: linear-gradient(rgba(0,0,0,0.5), url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1500&q=80')); background-size: cover; background-position: center;">
+                <div class="auto-slide-content">
+                    <h2>Family Friendly Shows</h2>
+                    <p>Find the perfect shows for family movie nights in our curated collection.</p>
+                    <button class="btn btn-primary">Browse Family Shows</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!--  -->
+
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>Explore</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Browse</a></li>
+                    <li><a href="#">Movies</a></li>
+                    <li><a href="#">TV Shows</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Account</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Profile</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Subscription</a></li>
+                    <li><a href="#">Watchlist</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Support</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Device Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Connect</h3>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Partners</a></li>
+                </ul>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 TechFlix. All rights reserved. This is a demo site for educational purposes.
+        </div>
+    </footer>
+
+    <script>
+        // Create stars for galaxy background
+        function createStars() {
+            const galaxy = document.getElementById('galaxy');
+            const starsCount = 200;
+
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+
+                // Random properties
+                const size = Math.random() * 3;
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const duration = 2 + Math.random() * 5;
+                const delay = Math.random() * 5;
+
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${left}%`;
+                star.style.top = `${top}%`;
+                star.style.setProperty('--duration', `${duration}s`);
+                star.style.setProperty('--delay', `${delay}s`);
+
+                galaxy.appendChild(star);
+            }
+
+            // Create nebulas
+            for (let i = 0; i < 3; i++) {
+                const nebula = document.createElement('div');
+                nebula.classList.add('nebula');
+
+                // Random properties
+                const left = Math.random() * 70;
+                const top = Math.random() * 70;
+                const duration = 30 + Math.random() * 30;
+
+                nebula.style.left = `${left}%`;
+                nebula.style.top = `${top}%`;
+                nebula.style.animationDuration = `${duration}s`;
+
+                galaxy.appendChild(nebula);
+            }
+        }
+
+        // Video Player Functionality
+        function initVideoPlayer() {
+            const video = document.getElementById('main-video');
+            const playPauseBtn = document.getElementById('play-pause');
+            const progressBar = document.getElementById('progress-bar');
+            const progressContainer = document.getElementById('progress-container');
+            const timeDisplay = document.getElementById('time-display');
+            const volumeSlider = document.getElementById('volume-slider');
+            const volumeLevel = document.getElementById('volume-level');
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+            // Play/Pause functionality
+            playPauseBtn.addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    video.pause();
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+
+            // Update progress bar as video plays
+            video.addEventListener('timeupdate', () => {
+                const percent = (video.currentTime / video.duration) * 100;
+                progressBar.style.width = `${percent}%`;
+
+                // Format time display
+                const currentMinutes = Math.floor(video.currentTime / 60);
+                const currentSeconds = Math.floor(video.currentTime % 60);
+                const durationMinutes = Math.floor(video.duration / 60);
+                const durationSeconds = Math.floor(video.duration % 60);
+
+                timeDisplay.textContent =
+                    `${currentMinutes.toString().padStart(2, '0')}:${currentSeconds.toString().padStart(2, '0')} / 
+                     ${durationMinutes.toString().padStart(2, '0')}:${durationSeconds.toString().padStart(2, '0')}`;
+            });
+
+            // Click on progress bar to seek
+            progressContainer.addEventListener('click', (e) => {
+                const pos = (e.pageX - progressContainer.getBoundingClientRect().left) / progressContainer.offsetWidth;
+                video.currentTime = pos * video.duration;
+            });
+
+            // Volume control
+            volumeSlider.addEventListener('click', (e) => {
+                const pos = (e.pageX - volumeSlider.getBoundingClientRect().left) / volumeSlider.offsetWidth;
+                const volume = Math.min(1, Math.max(0, pos));
+                video.volume = volume;
+                volumeLevel.style.width = `${volume * 100}%`;
+            });
+
+            // Set initial volume
+            video.volume = 0.8;
+            volumeLevel.style.width = '80%';
+
+            // Fullscreen functionality
+            fullscreenBtn.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    if (video.requestFullscreen) {
+                        video.requestFullscreen();
+                    } else if (video.mozRequestFullScreen) { /* Firefox */
+                        video.mozRequestFullScreen();
+                    } else if (video.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                        video.webkitRequestFullscreen();
+                    } else if (video.msRequestFullscreen) { /* IE/Edge */
+                        video.msRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            });
+
+            // Video ended
+            video.addEventListener('ended', () => {
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
+        }
+
+        // Initialize auto slider
+        function initAutoSlider() {
+            const slider = document.getElementById('auto-slider');
+            const slides = slider.children;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slider.style.transform = `translateX(-${index * 100}%)`;
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            // Auto slide every 5 seconds
+            setInterval(nextSlide, 5000);
+        }
+
+        // Initialize videos slider
+        function initVideosSlider() {
+            const slider = document.getElementById('videos-slider');
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            const cardWidth = 252 + 20; // card width + gap
+            let position = 0;
+
+            prevBtn.addEventListener('click', () => {
+                position = Math.min(position + cardWidth * 3, 0);
+                slider.style.transform = `translateX(${position}px)`;
+            });
+
+            nextBtn.addEventListener('click', () => {
+                const maxPosition = -(cardWidth * (slider.children.length - 4));
+                position = Math.max(position - cardWidth * 3, maxPosition);
+                slider.style.transform = `translateX(${position}px)`;
+            });
+        }
+
+        // Initialize watch buttons
+        function initWatchButtons() {
+            const videoCards = document.querySelectorAll('.video-card');
+
+            videoCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const title = card.querySelector('h3').textContent;
+                    document.querySelector('.video-title').textContent = title;
+
+                    // Reset player
+                    const video = document.getElementById('main-video');
+                    video.currentTime = 0;
+                    video.pause();
+                    document.getElementById('play-pause').innerHTML = '<i class="fas fa-play"></i>';
+                    document.getElementById('progress-bar').style.width = '0%';
+
+                    // Simulate loading new video
+                    console.log(`Loading video: ${title}`);
+                });
+            });
+        }
+
+        // Initialize mobile menu functionality
+        function initMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+        }
+
+        // Initialize header scroll effect
+        function initHeaderScroll() {
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+        }
+        
+        // Initialize watchlist functionality
+        function initWatchlist() {
+            const watchlistBtn = document.getElementById('watchlistBtn');
+            const notification = document.getElementById('watchlistNotification');
+            
+            // Check if already in watchlist
+            const isInWatchlist = localStorage.getItem('watchlist_bhoolbhulaiyaa2') === 'true';
+            
+            // Set initial button state
+            if (isInWatchlist) {
+                updateWatchlistButton(true);
+            }
+            
+            watchlistBtn.addEventListener('click', () => {
+                const currentState = localStorage.getItem('watchlist_bhoolbhulaiyaa2') === 'true';
+                const newState = !currentState;
+                
+                // Update localStorage
+                localStorage.setItem('watchlist_bhoolbhulaiyaa2', newState);
+                
+                // Update button
+                updateWatchlistButton(newState);
+                
+                // Show notification
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            });
+            
+            function updateWatchlistButton(added) {
+                const icon = watchlistBtn.querySelector('i');
+                const text = watchlistBtn.querySelector('span');
+                
+                if (added) {
+                    icon.className = 'fas fa-check';
+                    text.textContent = ' Added to Watchlist';
+                    watchlistBtn.classList.add('added');
+                } else {
+                    icon.className = 'fas fa-plus';
+                    text.textContent = ' Add to Watchlist';
+                    watchlistBtn.classList.remove('added');
+                }
+            }
+        }
+        
+        // Initialize download functionality
+        function initDownload() {
+            const downloadBtn = document.getElementById('downloadBtn');
+            const downloadOverlay = document.getElementById('downloadOverlay');
+            const closeDownload = document.getElementById('closeDownload');
+            const downloadOptions = document.querySelectorAll('.download-option');
+            
+            // Open download overlay
+            downloadBtn.addEventListener('click', () => {
+                downloadOverlay.classList.add('active');
+            });
+            
+            // Close download overlay
+            closeDownload.addEventListener('click', () => {
+                downloadOverlay.classList.remove('active');
+            });
+            
+            // Handle download options
+            downloadOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const quality = this.getAttribute('data-quality');
+                    
+                    // Create a temporary link to trigger download
+                    const link = document.createElement('a');
+                    link.href = './img/vide-v10.mp4';
+                    link.download = `Bhool_Bhulaiyaa_2_${quality}.mp4`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Close overlay
+                    downloadOverlay.classList.remove('active');
+                });
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            initVideoPlayer();
+            initAutoSlider();
+            initVideosSlider();
+            initWatchButtons();
+            initMobileMenu();
+            initHeaderScroll();
+            initWatchlist();
+            initDownload();
+        });
+    </script>
+</body>
+</html>

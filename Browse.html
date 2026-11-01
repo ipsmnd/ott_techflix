@@ -1,0 +1,2489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechFlix - Streaming Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #8a2be2;
+            --secondary: #00bfff;
+            --dark: #0f0c29;
+            --darker: #090617;
+            --light: #f5f5f5;
+            --card-bg: rgba(25, 20, 60, 0.7);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        body {
+            background: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Galaxy Background */
+        .galaxy-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 5s) infinite var(--delay, 0s);
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.2;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .nebula {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(30px);
+            animation: float 30s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(100px, 150px) rotate(90deg);
+            }
+
+            50% {
+                transform: translate(200px, 0) rotate(180deg);
+            }
+
+            75% {
+                transform: translate(100px, -150px) rotate(270deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        nav a {
+            color: #ddd;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+
+        nav a:hover,
+        nav a.active {
+            background: rgba(106, 90, 249, 0.3);
+            color: #fff;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 150px;
+        }
+
+        .search-bar input::placeholder {
+            color: #aaa;
+        }
+
+        .notification,
+        .user-icon {
+            background: rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notification::after {
+            content: "3";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        /* Enhanced Hero Section */
+        .hero {
+            position: relative;
+            height: 65vh;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 0 auto;
+            display: flex;
+            width: 90%;
+            align-items: center;
+            justify-items: center;
+            padding: 50px;
+            background: linear-gradient(90deg, rgba(15, 12, 41, 0.9) 0%, rgba(15, 12, 41, 0.5) 100%);
+            -webkit-mask-image: radial-gradient(103% 15% at 50% 103%, #0000 50%, rgb(48, 42, 42) 52%);
+            border: 0.1rem solid #9f428d54;
+
+        }
+
+        .hero-slides {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            padding: 0 50px;
+        }
+
+        .hero-slide::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(15, 12, 41, 0.9), rgba(15, 12, 41, 0.6));
+            z-index: -1;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            z-index: 2;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 1s ease;
+        }
+
+        .hero-slide.active .hero-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .hero-tag {
+            background: var(--gradient);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #d9e3f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #bbb;
+            max-width: 500px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--light);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+
+        /* Slide indicators */
+        .slide-indicators {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: var(--primary);
+            transform: scale(1.2);
+        }
+
+        /* Content Sliders */
+        .content-section {
+            padding: 40px 50px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), transparent);
+        }
+
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            padding: 10px 0;
+        }
+
+        .slider {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s ease;
+            padding: 10px 0;
+        }
+
+        .slider-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .slider-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .slider-btn:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .content-card {
+            max-width: 250px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            background: var(--card-bg);
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            height: 370px;
+        }
+
+        .content-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(138, 43, 226, 0.3);
+            z-index: 2;
+            border-color: var(--primary);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .content-card:hover .card-img {
+            transform: scale(1.1);
+        }
+
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(15, 12, 41, 0.9) 0%, transparent 100%);
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .content-card:hover .card-overlay {
+            opacity: 1;
+        }
+
+        .card-overlay h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .card-overlay .info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .card-overlay .rating {
+            color: #f5c518;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Card buttons */
+        .card-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .card-btn {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .watchlist-btn {
+            background: rgba(138, 43, 226, 0.7);
+            color: white;
+            border: none;
+        }
+
+        .download-btn {
+            background: transparent;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .card-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Category Filter */
+        .category-filter {
+            display: flex;
+            gap: 15px;
+            padding: 20px 50px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .category-btn.active,
+        .category-btn:hover {
+            background: var(--gradient);
+            transform: translateY(-2px);
+        }
+
+        /* Trending Section */
+        .section {
+            padding: 70px 50px;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .trending-card {
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 2/3;
+            background: var(--dark-gray);
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .trending-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(97, 17, 188, 0.985);
+            z-index: 2;
+        }
+
+        .trending-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .trending-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .trending-card .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .trending-card:hover .card-overlay {
+            opacity: 1;
+        }
+
+        .trending-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .trending-card .rating {
+            color: #f5c518;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 12, 41, 0.9);
+            padding: 60px 50px 30px;
+            margin-top: 70px;
+            border-top: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            background: var(--gradient);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(138, 43, 226, 0.3);
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1100px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .content-card {
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            nav {
+                /* padding: 15px 30px; */
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .search-bar {
+                order: 3;
+                width: 100%;
+                max-width: none;
+            }
+
+            .hero {
+                padding: 80px 30px 40px;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                overflow-x: auto;
+                padding-bottom: 10px;
+                gap: 15px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .content-section {
+                padding: 30px;
+            }
+
+            .category-filter {
+                padding: 15px 30px;
+            }
+
+            .slide-indicators {
+                bottom: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero {
+                padding: 70px 20px 30px;
+                text-align: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero p {
+                margin: 0 auto 30px;
+            }
+
+            .section-title {
+                font-size: 1.6rem;
+            }
+
+            .content-card {
+                min-width: 180px;
+            }
+        }
+
+        /* New Responsive Enhancements */
+        @media (max-width: 1400px) {
+
+            /* TV Screens */
+            .hero {
+                height: 60vh;
+            }
+        }
+
+        @media (max-width: 1200px) {
+
+            /* Large Laptops */
+            .hero {
+                height: 55vh;
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+
+        @media (max-width: 1024px) {
+
+            /* Laptops */
+            .hero {
+                height: 50vh;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+            }
+
+            .content-card {
+                min-width: 180px;
+                height: 320px;
+            }
+        }
+
+        @media (max-width: 900px) {
+
+            /* Tablets */
+            header {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .logo {
+                order: 1;
+            }
+
+            nav {
+                order: 3;
+                width: 100%;
+            }
+
+            .user-actions {
+                order: 2;
+            }
+
+            .hero {
+                height: 45vh;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 15px;
+            }
+
+            .section {
+                padding: 50px 30px;
+            }
+
+            .user-actions {
+                display: none;
+            }
+
+        }
+
+        @media (max-width: 768px) {
+
+            /* Large Mobile */
+            .hero {
+                height: 40vh;
+                padding: 40px 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 15px;
+            }
+
+            .content-card {
+                min-width: 160px;
+                height: 280px;
+            }
+
+            .footer-grid {
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 576px) {
+
+            /* Mobile */
+            .hero {
+                height: 35vh;
+                padding: 30px 15px;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-tag {
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+
+            .section {
+                padding: 40px 20px;
+            }
+
+            .category-filter {
+                gap: 10px;
+                padding: 15px 20px;
+            }
+
+            .category-btn {
+                padding: 6px 15px;
+                font-size: 0.8rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+
+            .footer-links li {
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            /* Small Mobile */
+            .hero {
+                height: 30vh;
+            }
+
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero p {
+                display: none;
+            }
+
+            .hero-buttons {
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .content-card {
+                min-width: 140px;
+                height: 250px;
+            }
+
+            .section-title {
+                font-size: 1.4rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* Navigation for mobile */
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            order: 2;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(15, 12, 41, 0.95);
+                flex-direction: column;
+                padding: 20px;
+                gap: 10px;
+                z-index: 100;
+            }
+
+            nav ul.active {
+                display: flex;
+            }
+
+            nav a {
+                display: block;
+                padding: 12px;
+                border-radius: 5px;
+            }
+
+            .user-actions {
+                display: none;
+            }
+
+            .hero-content {
+                display: block !important;
+            }
+
+            .hero-tag {
+                display: inline-block !important;
+            }
+
+        }
+
+        /* Search bar adjustments */
+        @media (max-width: 480px) {
+            .search-bar {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .search-bar input {
+                width: 100%;
+            }
+
+            .hero-buttons {
+                display: none;
+            }
+        }
+
+        /* Slider adjustments */
+        @media (max-width: 768px) {
+            .slider {
+                gap: 15px;
+            }
+
+            .slider-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Hero slide adjustments */
+        @media (max-width: 1024px) {
+            .hero-slide {
+                padding: 0 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-slide {
+                padding: 0 20px;
+                /* aspect-ratio: 5/3; */
+            }
+
+        }
+
+        /* Card overlay adjustments */
+        @media (max-width: 768px) {
+            .card-overlay h3 {
+                font-size: 1.1rem;
+            }
+
+            .card-overlay .info {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Prevent hover effects on touch devices */
+        @media (hover: none) {
+            .content-card:hover {
+                transform: none;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                border-color: rgba(138, 43, 226, 0.3);
+            }
+
+            .content-card:hover .card-img {
+                transform: none;
+            }
+
+            .content-card:hover .card-overlay {
+                opacity: 1;
+            }
+
+            .trending-card:hover {
+                transform: none;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .trending-card:hover img {
+                transform: none;
+            }
+
+            .trending-card:hover .card-overlay {
+                opacity: 1;
+            }
+        }
+
+        /* Mobile navigation bar */
+        .mobile-user-actions {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 12, 41, 0.95);
+            padding: 10px;
+            z-index: 1000;
+            justify-content: space-around;
+        }
+
+        .mobile-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #bbb;
+            font-size: 0.8rem;
+        }
+
+        .mobile-action i {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-user-actions {
+                display: flex;
+            }
+
+            .user-actions {
+                display: none;
+            }
+        }
+
+        /* Notification styles */
+        .notification-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--dark);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 15px 20px;
+            max-width: 300px;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification-popup.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification-popup h4 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Galaxy Background -->
+    <div class="galaxy-bg" id="galaxy"></div>
+
+    <!-- Notification popup -->
+    <div class="notification-popup" id="notification">
+        <h4>Added to Watchlist</h4>
+        <p id="notification-message"></p>
+    </div>
+
+    <!-- Navigation -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-play-circle"></i></div>
+            <div class="logo-text">TechFlix</div>
+        </div>
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <nav>
+            <ul id="navMenu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="Browse.html" class="active">Browse</a></li>
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="tvshows.html">TV Shows</a></li>
+                <li><a href="kids.html">Kids</a></li>
+                <li><a href="Profile.html">Profile</a></li>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search..." id="searchInput">
+            </div>
+            <div class="notification" id="notificationsBtn">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-icon">
+                <img src="./img/pabitraswain.jpg" alt="User"
+                    style="height: 40px; width: 40px; border-radius: 50%; border: 0.1rem solid #ff00cc;">
+            </div>
+        </div>
+    </header>
+    <!-- Enhanced Hero Slide Section -->
+    <section class="hero">
+        <div class="hero-slides">
+            <!-- Slide 1 -->
+            <div class="hero-slide active" style="background-image: url('./img/browse/BB1.webp');">
+                <div class="hero-content">
+                    <div class="hero-tag">NEW RELEASE</div>
+                    <h1>GOAT - The Greatest of All Time</h1>
+                    <p>He was his agency's top hostage negotiator, field agent and spy — but years after retiring, one
+                        mission brings his past back to haunt him and his family. <BR>Starring: Vijay, Prashanth, and
+                        Prabhu Deva</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="watchContent('GOAT - The Greatest of All Time')">
+                            <i class="fas fa-play"></i> Watch Now
+                        </button>
+                        <button class="btn btn-outline" onclick="addToWatchlist('GOAT - The Greatest of All Time')">
+                            <i class="fas fa-plus"></i> Add to List
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="hero-slide" style="background-image: url('./img/browse/BB2.webp');">
+                <div class="hero-content">
+                    <div class="hero-tag">EXCLUSIVE</div>
+                    <h1>PANCHAYAT</h1>
+                    <p>S1-S2-S3-S4 <br>. As panchayat polls near, pradha and bhushan fight for dominance - Abhishek's
+                        fate and the village's Fut....</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="watchContent('PANCHAYAT')">
+                            <i class="fas fa-play"></i> Watch Now
+                        </button>
+                        <button class="btn btn-outline" onclick="addToWatchlist('PANCHAYAT')">
+                            <i class="fas fa-plus"></i> Add to List
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="hero-slide" style="background-image: url('./img/browse/BB3.webp');">
+                <div class="hero-content">
+                    <div class="hero-tag">PREMIERE</div>
+                    <h1>MAARGAN</h1>
+                    <p> A cop haunted by his daughter's murder hunts a serial killer, uncovering shocking secrets in
+                        this gripping crime thriller.</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="watchContent('MAARGAN')">
+                            <i class="fas fa-play"></i> Watch Now
+                        </button>
+                        <button class="btn btn-outline" onclick="addToWatchlist('MAARGAN')">
+                            <i class="fas fa-plus"></i> Add to List
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 4 -->
+            <div class="hero-slide" style="background-image: url('./img/browse/BB4.webp');">
+                <div class="hero-content">
+                    <div class="hero-tag">PREMIERE</div>
+                    <h1>POSSESSION</h1>
+                    <p> A cop haunted by his daughter's murder hunts a serial killer, uncovering shocking secrets in
+                        this gripping crime thriller.</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="watchContent('possession')">
+                            <i class="fas fa-play"></i> Watch Now
+                        </button>
+                        <button class="btn btn-outline" onclick="addToWatchlist('possession')">
+                            <i class="fas fa-plus"></i> Add to List
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide indicators -->
+        <div class="slide-indicators" id="slide-indicators">
+            <!-- Indicators will be added by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Category Filter -->
+    <div class="category-filter">
+        <button class="category-btn active" onclick="filterContent('All')">All</button>
+        <button class="category-btn" onclick="filterContent('Romance')">Romance</button>
+        <button class="category-btn" onclick="filterContent('TV Shows')">TV Shows</button>
+        <button class="category-btn" onclick="filterContent('Music')">Music</button>
+        <button class="category-btn" onclick="filterContent('Documentary')">Documentary</button>
+        <button class="category-btn" onclick="filterContent('Sci-Fi')">Sci-Fi</button>
+        <button class="category-btn" onclick="filterContent('Fantasy')">Fantasy</button>
+        <button class="category-btn" onclick="filterContent('Horror')">Horror</button>
+        <button class="category-btn" onclick="filterContent('Animation')">Animation</button>
+    </div>
+
+    <!-- Content Sections -->
+    <section class="content-section">
+        <h2 class="section-title">
+            <i class="fas fa-fire"></i> Trending Now
+        </h2>
+        <div class="slider-container">
+            <div class="slider" id="trending-slider">
+
+                <div class="content-card" data-category="Sci-Fi">
+                    <div class="card-img" style="background: linear-gradient(45deg, #ff416c, #ff4b2b);"><img
+                            src="./img/browse/major-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>MAJOR</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.7</span>
+                            <span>2025</span>
+                            <span>Sci-Fi</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('MAJOR')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('MAJOR')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card" data-category="Fantasy">
+                    <div class="card-img" style="background: linear-gradient(45deg, #7b4397, #dc2430);"><img
+                            src="./img/browse/beast-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>BEAST</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 9.1</span>
+                            <span>2025</span>
+                            <span>Fantasy</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('beast')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('beast')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card" data-category="Sci-Fi">
+                    <div class="card-img" style="background: linear-gradient(45deg, #ff416c, #ff4b2b);"><img
+                            src="./img/browse/salaar-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>SALAAR</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.7</span>
+                            <span>2025</span>
+                            <span>Sci-Fi</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('SALAAR')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('SALAAR')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card" data-category="Documentary">
+                    <div class="card-img" style="background: linear-gradient(45deg, #f46b45, #eea849);"><img
+                            src="./img/browse/baattabamma-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>baattabamma</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.3</span>
+                            <span>2025</span>
+                            <span>Documentary</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('baattabamma')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('baattabamma')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card" data-category="Music">
+                    <div class="card-img" style="background: linear-gradient(45deg, #00c9ff, #92fe9d);"><img
+                            src="./img/browse/rrr-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>RRR</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 7.9</span>
+                            <span>2025</span>
+                            <span>Music</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('rrr-bct.webp')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('rrr-bct.webp')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card" data-category="Animation">
+                    <div class="card-img" style="background: linear-gradient(45deg, #1d976c, #93f9b9);"><img
+                            src="./img/browse/spyder-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>Spyder</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.9</span>
+                            <span>2025</span>
+                            <span>Craime</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('annabelle')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('annabelle')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card" data-category="Sci-Fi">
+                    <div class="card-img" style="background: linear-gradient(45deg, #ff416c, #ff4b2b);"><img
+                            src="./img/browse/luckybaskhar-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>Luckybaskhar</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.7</span>
+                            <span>2025</span>
+                            <span>Sci-Fi</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('annaatthe')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('annaatthe')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card" data-category="Fantasy">
+                    <div class="card-img" style="background: linear-gradient(45deg, #7b4397, #dc2430);"><img
+                            src="./img/browse/8vasantalu-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>8vasantalu</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 9.1</span>
+                            <span>2025</span>
+                            <span>Fantasy</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('8vasantalu')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('8vasantalu')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card" data-category="Music">
+                    <div class="card-img" style="background: linear-gradient(45deg, #00c9ff, #92fe9d);"><img
+                            src="./img/browse/vadh-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>VADH</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 7.9</span>
+                            <span>2025</span>
+                            <span>Music</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('VADH')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('VADH')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card" data-category="Sci-Fi">
+                    <div class="card-img" style="background: linear-gradient(45deg, #ff416c, #ff4b2b);"><img
+                            src="./img/browse/dilware-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>DILWARE</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.7</span>
+                            <span>2025</span>
+                            <span>Sci-Fi</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('dilware')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('dilware')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card" data-category="Sci-Fi">
+                    <div class="card-img" style="background: linear-gradient(45deg, #ff416c, #ff4b2b);"><img
+                            src="./img/browse/tujhootamemakkar-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>TU HHOOTA ME MAKKAR</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.7</span>
+                            <span>2025</span>
+                            <span>Sci-Fi</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('dilware')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('dilware')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card" data-category="Sci-Fi">
+                    <div class="card-img" style="background: linear-gradient(45deg, #ff416c, #ff4b2b);"><img
+                            src="./img/browse/raw-bct.webp" alt=""></div>
+                    <div class="card-overlay">
+                        <h3>RAW</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.7</span>
+                            <span>2025</span>
+                            <span>Sci-Fi</span>
+                        </div>
+                        <div class="card-buttons">
+                            <button class="card-btn watchlist-btn" onclick="addToWatchlist('RAW')">
+                                <i class="fas fa-plus"></i> Watchlist
+                            </button>
+                            <!-- <button class="card-btn download-btn" onclick="downloadContent('RAW')">
+                                <i class="fas fa-download"></i> Download
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-controls">
+                <button class="slider-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+                <button class="slider-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Filter Cards -->
+    <section class="section">
+        <h2 class="section-title">Top Movie's Now</h2>
+        <div class="trending-grid" id="trendingGrid">
+            <!-- START CARD -->
+            <div class="trending-card" data-category="Action">
+                <div style="background-image: url('./img/browse/raid2-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>RAID2</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.7/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('RAID2')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('RAID2')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Romance">
+                <div style="background-image: url('./img/browse/lailaMajnu-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>LAILA MAJNU</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>9.1/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('LAILA MAJNU')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('LAILA MAJNU')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Action">
+                <div style="background-image: url('./img/browse/super30-v.jpg'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>Super 30</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>7.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('RRR')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('RRR')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Romance">
+                <div style="background-image: url('./img/browse/radhashyam-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>RADHA SHYAM</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.3/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('RADHA SHYAM')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('RADHA SHYAM')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Action">
+                <div style="background-image: url('./img/browse/meter-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>METER</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('METER')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('METER')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Animation">
+                <div style="background-image: url('./img/browse/kuiko-b.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>KUIKO</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('KUIKO')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('KUIKO')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Romance">
+                <div style="background-image: url('./img/browse/kushi-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>KUSHI</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('KUSHI')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('KUSHI')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Action">
+                <div style="background-image: url('./img/browse/beast-bct.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>BEAST</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('BEAST')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('BEAST')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Action">
+                <div style="background-image: url('./img/browse/chhaava-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>CHHAAVA</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('CHHAAVA')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('CHHAAVA')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Romance">
+                <div style="background-image: url('./img/browse/lovejatri-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>LOVE JATRI</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('LOVE JATRI')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('LOVE JATRI')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <!-- =============================================================================== -->
+            <div class="trending-card" data-category="Drama">
+                <div style="background-image: url('./img/browse/8vasantalu-bct.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>8 Vasantalu</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.7/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('8 Vasantalu')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('8 Vasantalu')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Action">
+                <div style="background-image: url('./img/browse/malaal.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>MALAAL</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>9.1/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('ANNAATTHE')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('ANNAATTHE')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Documentary">
+                <div style="background-image: url('./img/browse/ma-v.jpg'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>MOVING IN WITH MALAIKA</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>7.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('ANNABELLE')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('ANNABELLE')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Comedy">
+                <div style="background-image: url('./img/browse/tm1-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>ANIMAL</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.3/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('BAATTABAMMA')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('BAATTABAMMA')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Comedy">
+                <div style="background-image: url('./img/browse/tm2-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>HASEEN DILLRUBA</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('BADEMIYANCHOTEMIYAN')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <button class="card-btn download-btn" onclick="downloadContent('BADEMIYANCHOTEMIYAN')">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Sci-Fi">
+                <div style="background-image: url('./img/browse/spider-Man3.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>SPIDER-MAN3</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('SPIDER-MAN3')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('SPIDER-MAN3')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Fantasy">
+                <div style="background-image: url('./img/browse/ravanashura.jpg'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>RAVANASHURA</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('RAVANASHURA')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('RAVANASHURA')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Animation">
+                <div style="background-image: url('./img/browse/THEROADTOELORADO.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>THE ROAD TO EL DORADO</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('THE ROAD TO EL DORADO')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('THE ROAD TO EL DORADO')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Documentary">
+                <div style="background-image: url('./img/browse/jawan-bct.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>JAWAN</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('JAWAN')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('JAWAN')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Sci-Fi">
+                <div style="background-image: url('./img/browse/irada.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>IRADA</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('IRADA')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <button class="card-btn download-btn" onclick="downloadContent('IRADA')">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- =================================================================================== -->
+            <div class="trending-card" data-category="Romance">
+                <div style="background-image: url('./img/browse/loveaajkal.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>LOVEAAJKAL</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.7/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('LOVEAAJKAL')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('LOVEAAJKAL')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Action">
+                <div style="background-image: url('./img/browse/mom-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>MOM</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>9.1/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('MOM')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('MOM')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Romance">
+                <div style="background-image: url('./img/browse/nanna.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>NANNA</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>7.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('NANNA')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('NANNA')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Comedy">
+                <div style="background-image: url('./img/browse/shehzada.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>SHEHZADA</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.3/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('shehzada')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('shehzada')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Comedy">
+                <div style="background-image: url('./img/browse/kannum-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>KANNUM</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('KANNUM')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('KANNUM')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Horror">
+                <div style="background-image: url('./img/browse/jaat-c.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>JAAT</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>7.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('JAAT')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('JAAT')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Comedy">
+                <div style="background-image: url('./img/browse/raees-c.jpg'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>RAEES</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.3/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('RAEES')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('RAEES')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+            <div class="trending-card" data-category="Comedy">
+                <div style="background-image: url('./img/browse/dhokha.webp'); height: 100%;">
+                </div>
+                <div class="card-overlay">
+                    <h3>DHOKHA</h3>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <span>8.9/10</span>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="card-btn watchlist-btn" onclick="addToWatchlist('DHOKHA')">
+                            <i class="fas fa-plus"></i> Watchlist
+                        </button>
+                        <!-- <button class="card-btn download-btn" onclick="downloadContent('DHOKHA')">
+                            <i class="fas fa-download"></i> Download
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+             <!-- =================================================================================== -->
+            <!-- END CARD -->
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="seeMoreBtn" class="btn btn-outline">See more</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>Explore</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Browse</a></li>
+                    <li><a href="#">Movies</a></li>
+                    <li><a href="#">TV Shows</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Account</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Profile</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Subscription</a></li>
+                    <li><a href="#">Watchlist</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Support</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Device Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Connect</h3>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Partners</a></li>
+                </ul>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 TechFlix. All rights reserved. This is a demo site for educational purposes.
+        </div>
+    </footer>
+
+    <!-- Mobile navigation bar -->
+    <div class="mobile-user-actions">
+        <div class="mobile-action" onclick="window.location.href='#'">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </div>
+        <div class="mobile-action" onclick="window.location.href='#'">
+            <i class="fas fa-compass"></i>
+            <span>Browse</span>
+        </div>
+        <div class="mobile-action" onclick="showSearch()">
+            <i class="fas fa-search"></i>
+            <span>Search</span>
+        </div>
+        <div class="mobile-action" onclick="window.location.href='#'">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </div>
+    </div>
+
+    <script>
+        // ========== Watchlist functionality ==========
+        function addToWatchlist(title) {
+            let watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
+            if (!watchlist.includes(title)) {
+                watchlist.push(title);
+                localStorage.setItem('watchlist', JSON.stringify(watchlist));
+                showNotification(`"${title}" added to watchlist!`);
+            } else {
+                showNotification(`"${title}" is already in your watchlist!`);
+            }
+        }
+
+        // ========== Download functionality ==========
+        function downloadContent(title) {
+            showNotification(`Downloading: ${title}...`);
+            // Simulate download progress
+            setTimeout(() => {
+                showNotification(`Download complete: ${title}`);
+            }, 2000);
+        }
+
+        // ========== Watch functionality ==========
+        function watchContent(title) {
+            // Save the current movie to localStorage
+            localStorage.setItem('currentMovie', title);
+            // Navigate to video player
+            showNotification(`Now playing: ${title}`);
+        }
+
+        // ========== Notification system ==========
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const messageElement = document.getElementById('notification-message');
+
+            messageElement.textContent = message;
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // ========== See More/Less functionality ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            const seeMoreBtn = document.getElementById('seeMoreBtn');
+            const cards = document.querySelectorAll('.trending-card');
+            const totalCards = cards.length;
+            let visibleCards = 10;
+
+            // Initially hide cards beyond the first 10
+            for (let i = visibleCards; i < totalCards; i++) {
+                cards[i].style.display = 'none';
+            }
+
+            seeMoreBtn.addEventListener('click', function () {
+                if (seeMoreBtn.textContent === 'See more') {
+                    // Show next 10 cards
+                    let nextVisible = visibleCards + 10;
+                    for (let i = visibleCards; i < nextVisible && i < totalCards; i++) {
+                        cards[i].style.display = 'block';
+                    }
+                    visibleCards = nextVisible;
+
+                    if (visibleCards >= totalCards) {
+                        seeMoreBtn.textContent = 'See less';
+                    }
+                } else {
+                    // Hide all cards beyond the initial 10
+                    for (let i = 10; i < totalCards; i++) {
+                        cards[i].style.display = 'none';
+                    }
+                    visibleCards = 10;
+                    seeMoreBtn.textContent = 'See more';
+                }
+            });
+
+            // ========== Category filter functionality ==========
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            const contentCards = document.querySelectorAll('.content-card, .trending-card');
+
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.textContent;
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    contentCards.forEach(card => {
+                        if (category === 'All') {
+                            card.style.display = 'block';
+                        } else {
+                            const cardCategory = card.dataset.category;
+                            card.style.display = cardCategory === category ? 'block' : 'none';
+                        }
+                    });
+                });
+            });
+
+            // ========== Mobile menu toggle ==========
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+
+            // ========== Mobile search function ==========
+            window.showSearch = function () {
+                const searchTerm = prompt("Enter search term:");
+                if (searchTerm) {
+                    showNotification(`Searching for: ${searchTerm}`);
+                }
+            };
+
+            // ========== Hero slider functionality ==========
+            const slides = document.querySelectorAll('.hero-slide');
+            const indicatorsContainer = document.getElementById('slide-indicators');
+            let currentIndex = 0;
+            let slideInterval;
+
+            // Create indicators
+            slides.forEach((slide, index) => {
+                const indicator = document.createElement('div');
+                indicator.classList.add('indicator');
+                if (index === currentIndex) indicator.classList.add('active');
+
+                indicator.addEventListener('click', () => {
+                    goToSlide(index);
+                });
+
+                indicatorsContainer.appendChild(indicator);
+            });
+
+            const indicators = document.querySelectorAll('.indicator');
+
+            function goToSlide(index) {
+                // Remove active class from current slide and indicator
+                slides[currentIndex].classList.remove('active');
+                indicators[currentIndex].classList.remove('active');
+
+                // Set new slide
+                currentIndex = index;
+
+                // Add active class to new slide and indicator
+                slides[currentIndex].classList.add('active');
+                indicators[currentIndex].classList.add('active');
+
+                // Reset the interval
+                resetInterval();
+            }
+
+            function nextSlide() {
+                const nextIndex = (currentIndex + 1) % slides.length;
+                goToSlide(nextIndex);
+            }
+
+            function resetInterval() {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+            }
+
+            // Start the slider
+            resetInterval();
+
+            // Pause on hover
+            const heroSection = document.querySelector('.hero');
+            heroSection.addEventListener('mouseenter', () => {
+                clearInterval(slideInterval);
+            });
+
+            heroSection.addEventListener('mouseleave', resetInterval);
+
+            // ========== Slider functionality ==========
+            document.querySelectorAll('.slider-container').forEach(container => {
+                const slider = container.querySelector('.slider');
+                const prevBtn = container.querySelector('.prev-btn');
+                const nextBtn = container.querySelector('.next-btn');
+                const cardWidth = 250 + 20; // card width + gap
+                let position = 0;
+
+                prevBtn.addEventListener('click', () => {
+                    position = Math.min(position + cardWidth * 3, 0);
+                    slider.style.transform = `translateX(${position}px)`;
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    const maxPosition = -(cardWidth * (slider.children.length - 4));
+                    position = Math.max(position - cardWidth * 3, maxPosition);
+                    slider.style.transform = `translateX(${position}px)`;
+                });
+            });
+
+            // ========== Create stars for galaxy background ==========
+            function createStars() {
+                const galaxy = document.getElementById('galaxy');
+                const starsCount = 200;
+
+                for (let i = 0; i < starsCount; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('star');
+
+                    // Random properties
+                    const size = Math.random() * 3;
+                    const left = Math.random() * 100;
+                    const top = Math.random() * 100;
+                    const duration = 2 + Math.random() * 5;
+                    const delay = Math.random() * 5;
+
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    star.style.left = `${left}%`;
+                    star.style.top = `${top}%`;
+                    star.style.setProperty('--duration', `${duration}s`);
+                    star.style.setProperty('--delay', `${delay}s`);
+
+                    galaxy.appendChild(star);
+                }
+
+                // Create nebulas
+                for (let i = 0; i < 3; i++) {
+                    const nebula = document.createElement('div');
+                    nebula.classList.add('nebula');
+
+                    // Random properties
+                    const left = Math.random() * 70;
+                    const top = Math.random() * 70;
+                    const duration = 30 + Math.random() * 30;
+
+                    nebula.style.left = `${left}%`;
+                    nebula.style.top = `${top}%`;
+                    nebula.style.animationDuration = `${duration}s`;
+
+                    galaxy.appendChild(nebula);
+                }
+            }
+
+            createStars();
+
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('header');
+                if (window.scrollY > 50) {
+                    header.style.background = 'rgba(15, 12, 41, 0.95)';
+                } else {
+                    header.style.background = 'rgba(0, 0, 0, 0.5)';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

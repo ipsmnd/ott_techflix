@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechFlix | Movies</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #8a2be2;
+            --secondary: #00bfff;
+            --dark: #0f0c29;
+            --darker: #090617;
+            --light: #f5f5f5;
+            --card-bg: rgba(25, 20, 60, 0.7);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        body {
+            background: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Galaxy Background */
+        .galaxy-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 5s) infinite var(--delay, 0s);
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.2;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .nebula {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(30px);
+            animation: float 30s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(100px, 150px) rotate(90deg);
+            }
+
+            50% {
+                transform: translate(200px, 0) rotate(180deg);
+            }
+
+            75% {
+                transform: translate(100px, -150px) rotate(270deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        nav a {
+            color: #ddd;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+
+        nav a:hover,
+        nav a.active {
+            background: rgba(106, 90, 249, 0.3);
+            color: #fff;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 150px;
+        }
+
+        .search-bar input::placeholder {
+            color: #aaa;
+        }
+
+        .notification,
+        .user-icon {
+            background: rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notification::after {
+            content: "3";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        /* Page Content */
+        .page-content {
+            padding: 30px 50px;
+            max-width: 2000px;
+            margin: 0 auto;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            position: relative;
+            height: 65vh;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 50px;
+            display: flex;
+            width: 100%;
+            align-items: center;
+            padding: 0 50px;
+            background: linear-gradient(90deg, rgba(15, 12, 41, 0.9) 0%, rgba(15, 12, 41, 0.5) 100%);
+            -webkit-mask-image: radial-gradient(103% 15% at 50% 103%, #0000 50%, rgb(48, 42, 42) 52%);
+            border: 0.1rem solid #9f428d54;
+
+        }
+
+        .hero-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            /* z-index: 999; */
+            opacity: 0;
+            transform: translateY(50px);
+            animation: slideUp 1s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-banner img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .hero-tag {
+            background: var(--gradient);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #d9e3f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: #bbb;
+            max-width: 500px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--light);
+        }
+
+        .btn-watchlist-added {
+            background: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+
+        /* Content Sliders */
+        .content-section {
+            margin-bottom: 60px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .view-all {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .view-all:hover {
+            text-decoration: underline;
+        }
+
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            padding: 10px 0;
+        }
+
+        .slider {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s ease;
+            padding: 10px 0;
+        }
+
+        .slider-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .slider-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .slider-btn:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .content-card {
+            max-width: 250px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            background: var(--card-bg);
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            height: 370px;
+        }
+
+        .content-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(138, 43, 226, 0.3);
+            z-index: 2;
+            border-color: var(--primary);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .content-card:hover .card-img {
+            transform: scale(1.1);
+        }
+
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(15, 12, 41, 0.9) 0%, transparent 100%);
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .content-card:hover .card-overlay {
+            opacity: 1;
+        }
+
+        .card-overlay h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .card-overlay .info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .card-overlay .rating {
+            color: #f5c518;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Auto Slider Banner */
+        .auto-slider-container {
+            position: relative;
+            height: 600px;
+            border-radius: 20px;
+            overflow: hidden;
+            /* margin: 50px 0; */
+            margin-bottom: -70px;
+        }
+
+        .auto-slider {
+            display: flex;
+            height: 100%;
+            transition: transform 1s ease-in-out;
+        }
+
+        .auto-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .auto-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .auto-slide-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 50px;
+            max-width: 800px;
+            text-align: center;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 1s ease-out, opacity 1.5s ease;
+        }
+
+        .auto-slide.active .auto-slide-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .auto-slide h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #d9e3f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auto-slide p {
+            font-size: 1.2rem;
+            color: #bbb;
+            margin-bottom: 30px;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 12, 41, 0.9);
+            padding: 60px 50px 30px;
+            margin-top: 70px;
+            border-top: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            background: var(--gradient);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(138, 43, 226, 0.3);
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Video Modal */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-modal.active {
+            display: flex;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            position: relative;
+            width: 80%;
+            max-width: 1200px;
+            background: var(--darker);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+        }
+
+        .video-container {
+            position: relative;
+            padding-top: 56.25%;
+            /* 16:9 Aspect Ratio */
+        }
+
+        .video-player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        .video-player video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        .video-player:hover .video-controls {
+            opacity: 1;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background: var(--primary);
+            border-radius: 3px;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .progress-container:hover .progress-bar::after {
+            opacity: 1;
+        }
+
+        .control-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .left-controls,
+        .right-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .time-display {
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .volume-slider {
+            width: 70px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .volume-level {
+            height: 100%;
+            width: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .close-modal:hover {
+            background: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        .video-title {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 15px;
+            border-radius: 5px;
+            z-index: 5;
+            max-width: 80%;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(25, 20, 60, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast i {
+            color: #4CAF50;
+            font-size: 1.2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1100px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .content-card {
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            nav {
+                /* padding: 15px 30px; */
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .search-bar {
+                order: 3;
+                width: 100%;
+                max-width: none;
+            }
+
+            .hero {
+                padding: 80px 30px 40px;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                overflow-x: auto;
+                padding-bottom: 10px;
+                gap: 15px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .content-section {
+                padding: 30px;
+            }
+
+            .category-filter {
+                padding: 15px 30px;
+            }
+
+            .slide-indicators {
+                bottom: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero {
+                padding: 70px 20px 30px;
+                text-align: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero p {
+                margin: 0 auto 30px;
+            }
+
+            .section-title {
+                font-size: 1.6rem;
+            }
+
+            .content-card {
+                min-width: 180px;
+            }
+        }
+
+        /* New Responsive Enhancements */
+        @media (max-width: 1400px) {
+
+            /* TV Screens */
+            .hero {
+                height: 60vh;
+            }
+        }
+
+        @media (max-width: 1200px) {
+
+            /* Large Laptops */
+            .hero {
+                height: 55vh;
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+
+        @media (max-width: 1024px) {
+
+            /* Laptops */
+            .hero {
+                height: 50vh;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+            }
+
+            .content-card {
+                min-width: 180px;
+                height: 320px;
+            }
+        }
+
+        @media (max-width: 900px) {
+
+            /* Tablets */
+            header {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .logo {
+                order: 1;
+            }
+
+            nav {
+                order: 3;
+                width: 100%;
+            }
+
+            .user-actions {
+                order: 2;
+            }
+
+            .hero {
+                height: 45vh;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 15px;
+            }
+
+            .section {
+                padding: 50px 30px;
+            }
+
+            .user-actions {
+                display: none;
+            }
+
+        }
+
+        @media (max-width: 768px) {
+
+            /* Large Mobile */
+            .hero {
+                height: 40vh;
+                padding: 40px 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 15px;
+            }
+
+            .content-card {
+                min-width: 160px;
+                height: 280px;
+            }
+
+            .footer-grid {
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 576px) {
+
+            /* Mobile */
+            .hero {
+                height: 35vh;
+                padding: 30px 15px;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-tag {
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+
+            .section {
+                padding: 40px 20px;
+            }
+
+            .category-filter {
+                gap: 10px;
+                padding: 15px 20px;
+            }
+
+            .category-btn {
+                padding: 6px 15px;
+                font-size: 0.8rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+
+            .footer-links li {
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            /* Small Mobile */
+            .hero {
+                height: 30vh;
+            }
+
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero p {
+                display: none;
+            }
+
+            .hero-buttons {
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .content-card {
+                min-width: 140px;
+                height: 250px;
+            }
+
+            .section-title {
+                font-size: 1.4rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* Navigation for mobile */
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            order: 2;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(15, 12, 41, 0.95);
+                flex-direction: column;
+                padding: 20px;
+                gap: 10px;
+                z-index: 100;
+            }
+
+            nav ul.active {
+                display: flex;
+            }
+
+            nav a {
+                display: block;
+                padding: 12px;
+                border-radius: 5px;
+            }
+
+            .user-actions {
+                display: none;
+            }
+
+            .hero-content {
+                display: none;
+            }
+
+
+        }
+
+        /* Search bar adjustments */
+        @media (max-width: 480px) {
+            .search-bar {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .search-bar input {
+                width: 100%;
+            }
+        }
+
+        /* Slider adjustments */
+        @media (max-width: 768px) {
+            .slider {
+                gap: 15px;
+            }
+
+            .slider-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Hero slide adjustments */
+        @media (max-width: 1024px) {
+            .hero-slide {
+                padding: 0 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-slide {
+                padding: 0 20px;
+            }
+        }
+
+        /* Card overlay adjustments */
+        @media (max-width: 768px) {
+            .card-overlay h3 {
+                font-size: 1.1rem;
+            }
+
+            .card-overlay .info {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Prevent hover effects on touch devices */
+        @media (hover: none) {
+            .content-card:hover {
+                transform: none;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                border-color: rgba(138, 43, 226, 0.3);
+            }
+
+            .content-card:hover .card-img {
+                transform: none;
+            }
+
+            .content-card:hover .card-overlay {
+                opacity: 1;
+            }
+
+            .trending-card:hover {
+                transform: none;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .trending-card:hover img {
+                transform: none;
+            }
+
+            .trending-card:hover .card-overlay {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Galaxy Background -->
+    <div class="galaxy-bg" id="galaxy"></div>
+
+    <!-- Navigation -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-play-circle"></i></div>
+            <div class="logo-text"><a href="index.html">TechFlix</a></div>
+        </div>
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <nav>
+            <ul id="navMenu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="Browse.html">Browse</a></li>
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="tvshows.html">TV Shows</a></li>
+                <li><a href="kids.html" class="active">Kids</a></li>
+                <li><a href="Profile.html">Profile</a></li>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="notification">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-icon">
+                <img src="./img/pabitraswain.jpg" alt="PS"
+                    style="height: 40px; width: 40px; border-radius: 50%; border: 0.1rem solid  #ff00cc;">
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-content">
+        <!-- Hero Banner with Auto Slider -->
+        <div class="hero-banner">
+            <!-- Hero Slider -->
+            <div class="hero-slider">
+                <div class="hero-slide active" style="background-image: url('./img/h1-s.webp')"></div>
+                <div class="hero-slide" style="background-image: url('./img/h2-s.webp')"></div>
+                <div class="hero-slide" style="background-image: url('./img/h3-s.webp')"></div>
+                <div class="hero-slide" style="background-image: url('./img/h4-s.webp')"></div>
+                <div class="hero-slide" style="background-image: url('./img/h5-s.webp')"></div>
+                <div class="hero-slide" style="background-image: url('./img/h6-s.webp')"></div>
+                <div class="hero-slide" style="background-image: url('./img/h7-s.webp')"></div>
+                <div class="hero-slide" style="background-image: url('./img/h8-s.webp')"></div>
+                <div class="hero-slide" style="background-image: url('./img/h9-s.webp')"></div>
+
+            </div>
+            <!-- Hero Content -->
+            <div class="hero-content">
+                <div class="hero-tag">NEW RELEASE</div>
+                <h1>The Best Movie's in our Platform</h1>
+                <p>Unlimited Entertainment, Anytime, Anywhere | TechFlix</h1>
+                <h2>Watch the latest movies, TV shows, and exclusive A
+                    cinematic experience like no other.</p>
+                    <div class="hero-buttons">
+                        <button id="play-hero" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Watch Now
+                        </button>
+                        <button id="watchlist-btn" class="btn btn-outline">
+                            <i class="fas fa-plus"></i> Add to Watchlist
+                        </button>
+                    </div>
+            </div>
+        </div>
+
+
+
+        <!-- Content Sections | Trending Movies Stert -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-fire"></i> Trending Movies</h2>
+                <a href="#" class="view-all">View All</a>
+            </div>
+
+            <div class="slider-container">
+                <div class="slider" id="trending-slider">
+                    <!-- Card Stert -->
+                    <div class="content-card">
+                        <div class="card-img"><img src="./img/tm1-c.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Cosmic Harmony</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.7</span>
+                                <span>2025</span>
+                                <span>Sci-Fi</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #7b4397, #dc2430);"><img
+                                src="./img/tm2-c.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Nebula Dreams</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.1</span>
+                                <span>2025</span>
+                                <span>Fantasy</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #00c9ff, #92fe9d);"><img
+                                src="./img/tm3-c.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Quantum Beats</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 7.9</span>
+                                <span>2025</span>
+                                <span>Music</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #f46b45, #eea849);"><img
+                                src="./img/tm4-c.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Galactic Symphony</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.3</span>
+                                <span>2025</span>
+                                <span>Documentary</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #1d976c, #93f9b9);"><img
+                                src="./img/tm5-c.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Starfall Serenade</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.9</span>
+                                <span>2025</span>
+                                <span>Animation</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #614385, #516395);"><img
+                                src="./img/tm6-c.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Rhythm of the Universe</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.2</span>
+                                <span>2025</span>
+                                <span>Sci-Fi</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-img"><img src="./img/tm7-c.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Cosmic Harmony</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.7</span>
+                                <span>2025</span>
+                                <span>Sci-Fi</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #7b4397, #dc2430);"><img
+                                src="./img/tm8-c.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Nebula Dreams</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.1</span>
+                                <span>2025</span>
+                                <span>Fantasy</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #00c9ff, #92fe9d);"><img
+                                src="./img/tm9-c.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Quantum Beats</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 7.9</span>
+                                <span>2025</span>
+                                <span>Music</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #f46b45, #eea849);"><img
+                                src="./img/tm10-c.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Galactic Symphony</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.3</span>
+                                <span>2025</span>
+                                <span>Documentary</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card End -->
+                </div>
+                <div class="slider-controls">
+                    <button class="slider-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button class="slider-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+        <!-- Trending Movies End  -->
+
+
+
+        <!--  Top Rated Start -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-trophy"></i> Top Rated</h2>
+                <a href="#" class="view-all">View All</a>
+            </div>
+            <div class="slider-container">
+                <div class="slider" id="top-rated-slider">
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #4b6cb7, #182848);"><img
+                                src="./img/malaal.webp" alt="malaal"></div>
+                        <div class="card-overlay">
+                            <h3>MALAAL</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.5</span>
+                                <span>2025</span>
+                                <span>Concert</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #ff5858, #f09819);"><img
+                                src="./img/nanna.webp" alt="nanna"></div>
+                        <div class="card-overlay">
+                            <h3>NANNA</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.3</span>
+                                <span>2025</span>
+                                <span>EDM</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #4568dc, #b06ab3);"><img
+                                src="./img/lovejatri-c.webp" alt="lovejatri"></div>
+                        <div class="card-overlay">
+                            <h3>LOVE JATRI</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.0</span>
+                                <span>2025</span>
+                                <span>Concert</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #4568dc, #b06ab3);"><img
+                                src="./img/8vasantalu.webp" alt="8vasantalu"></div>
+                        <div class="card-overlay">
+                            <h3>8vasantalu</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.0</span>
+                                <span>2025</span>
+                                <span>Concert</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #ff9966, #ff5e62);"><img
+                                src="./img/annaatthe.webp" alt="annaatthe"></div>
+                        <div class="card-overlay">
+                            <h3>annaatthe</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.9</span>
+                                <span>2025</span>
+                                <span>Pop</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #4b6cb7, #182848);"><img
+                                src="./img/annabelle.webp" alt="annabelle"></div>
+                        <div class="card-overlay">
+                            <h3>annabelle</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.5</span>
+                                <span>2025</span>
+                                <span>Concert</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #ff5858, #f09819);"><img
+                                src="./img/baattabamma.webp" alt="baattabamma"></div>
+                        <div class="card-overlay">
+                            <h3>baattabamma</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.3</span>
+                                <span>2025</span>
+                                <span>EDM</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #4568dc, #b06ab3);"><img
+                                src="./img/bademiyanchotemiyan.webp" alt="bademiyanchotemiyan"></div>
+                        <div class="card-overlay">
+                            <h3>bademiyanchotemiyan</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.0</span>
+                                <span>2025</span>
+                                <span>Concert</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #ff9966, #ff5e62);"><img
+                                src="./img/car1.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Galaxy Grooves</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.9</span>
+                                <span>2025</span>
+                                <span>Pop</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #396afc, #2948ff);"><img
+                                src="./img/card2.webp" alt=""></div>
+                        <div class="card-overlay">
+                            <h3>Space Symphony</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 9.4</span>
+                                <span>2025</span>
+                                <span>Orchestral</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slider-controls">
+                    <button class="slider-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button class="slider-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+        <!-- Top Rated End -->
+
+
+
+        <!-- New Releases Start -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-calendar"></i> New Releases</h2>
+                <a href="#" class="view-all">View All</a>
+            </div>
+            <div class="slider-container">
+                <div class="slider" id="new-releases-slider">
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #8E2DE2, #4A00E0);"><img
+                                src="./img/dilware.webp" alt="dilware"></div>
+                        <div class="card-overlay">
+                            <h3>dilware</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.9</span>
+                                <span>2025</span>
+                                <span>Adventure</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #00F260, #0575E6);"><img
+                                src="./img/shaitaan.webp" alt="shaitaan"></div>
+                        <div class="card-overlay">
+                            <h3>shaitaan</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.3</span>
+                                <span>2025</span>
+                                <span>Thriller</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #f5576c, #f093fb);"><img
+                                src="./img/nightswim.webp" alt="nightswim"></div>
+                        <div class="card-overlay">
+                            <h3>nightswim</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 7.7</span>
+                                <span>2025</span>
+                                <span>Drama</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #5D4157, #A8CABA);"><img
+                                src="./img/summerslam.webp" alt="summerslam"></div>
+                        <div class="card-overlay">
+                            <h3>summerslam</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.8</span>
+                                <span>2025</span>
+                                <span>Mystery</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #8E2DE2, #4A00E0);"><img
+                                src="./img/iraivan.webp" alt="iraivan"></div>
+                        <div class="card-overlay">
+                            <h3>iraivan</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.9</span>
+                                <span>2025</span>
+                                <span>Adventure</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #00F260, #0575E6);"><img
+                                src="./img/don.webp" alt="don"></div>
+                        <div class="card-overlay">
+                            <h3>DON</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.3</span>
+                                <span>2025</span>
+                                <span>Thriller</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #f5576c, #f093fb);"><img
+                                src="./img/finadestination.webp" alt="finadestination"></div>
+                        <div class="card-overlay">
+                            <h3>finadestination</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 7.7</span>
+                                <span>2025</span>
+                                <span>Drama</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #5D4157, #A8CABA);"><img
+                                src="./img/padmini-c.webp" alt="padmini"></div>
+                        <div class="card-overlay">
+                            <h3>padmini</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.8</span>
+                                <span>2025</span>
+                                <span>Mystery</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-img" style="background: linear-gradient(45deg, #1D2B64, #F8CDDA);"><img
+                                src="./img/loveaajkal.webp" alt="loveaajkal"></div>
+                        <div class="card-overlay">
+                            <h3>Love Aaj Kal</h3>
+                            <div class="info">
+                                <span class="rating"><i class="fas fa-star"></i> 8.1</span>
+                                <span>2025</span>
+                                <span>Action</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slider-controls">
+                    <button class="slider-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button class="slider-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+        <!-- New Releases End -->
+    </div>
+
+
+    <!-- Auto Slider Banner -->
+    <div class="auto-slider-container">
+        <div class="auto-slider" id="auto-slider">
+            <div class="auto-slide active" style="background-image: url('./img/mom-b.jpg')">
+                <div class="auto-slide-content">
+                    <h2>Exclusive Movie Premieres</h2>
+                    <p>New releases every Friday. Watch the latest blockbusters before anyone else.</p>
+                    <button class="btn btn-primary">Explore New Releases</button>
+                </div>
+            </div>
+            <div class="auto-slide" style="background-image: url('./img/salaar2-b.avif')">
+                <div class="auto-slide-content">
+                    <h2>Premium 4K Streaming</h2>
+                    <p>Experience cinema-quality visuals with our premium 4K HDR streaming.</p>
+                    <button class="btn btn-primary">Upgrade Plan</button>
+                </div>
+            </div>
+            <div class="auto-slide" style="background-image: url('./img/b3.webp')">
+                <div class="auto-slide-content">
+                    <h2>Family Movie Nights</h2>
+                    <p>Discover our curated collection of family-friendly movies for your next movie night.</p>
+                    <button class="btn btn-primary">Browse Family Movies</button>
+                </div>
+            </div>
+            <div class="auto-slide active" style="background-image: url('./img/mom-b.jpg')">
+                <div class="auto-slide-content">
+                    <h2>Exclusive Movie Premieres</h2>
+                    <p>New releases every Friday. Watch the latest blockbusters before anyone else.</p>
+                    <button class="btn btn-primary">Explore New Releases</button>
+                </div>
+            </div>
+            <div class="auto-slide" style="background-image: url('./img/b3.jpg')">
+                <div class="auto-slide-content">
+                    <h2>Premium 4K Streaming</h2>
+                    <p>Experience cinema-quality visuals with our premium 4K HDR streaming.</p>
+                    <button class="btn btn-primary">Upgrade Plan</button>
+                </div>
+            </div>
+            <div class="auto-slide" style="background-image: url('./img/b2.webp')">
+                <div class="auto-slide-content">
+                    <h2>Family Movie Nights</h2>
+                    <p>Discover our curated collection of family-friendly movies for your next movie night.</p>
+                    <button class="btn btn-primary">Browse Family Movies</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>Explore</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Browse</a></li>
+                    <li><a href="#">Movies</a></li>
+                    <li><a href="#">TV Shows</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Account</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Profile</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Subscription</a></li>
+                    <li><a href="#">Watchlist</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Support</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Device Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Connect</h3>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Partners</a></li>
+                </ul>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 TechFlix. All rights reserved. This is a demo site for educational purposes.
+        </div>
+    </footer>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span>Added to Watchlist</span>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div class="video-modal" id="videoModal">
+        <div class="modal-content">
+            <div class="close-modal" id="closeModal">
+                <i class="fas fa-times"></i>
+            </div>
+            <div class="video-title"> JAWAN</div>
+            <div class="video-container">
+                <div class="video-player">
+                    <video id="player" poster="./img/jawan-c.webp">
+                        <source src="./img/video-v.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="video-controls">
+                        <div class="progress-container">
+                            <div class="progress-bar"></div>
+                        </div>
+                        <div class="control-buttons">
+                            <div class="left-controls">
+                                <button class="control-btn" id="playPauseBtn">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <div class="time-display">
+                                    <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                                </div>
+                            </div>
+                            <div class="right-controls">
+                                <div class="volume-container">
+                                    <button class="control-btn" id="muteBtn">
+                                        <i class="fas fa-volume-up"></i>
+                                    </button>
+                                    <div class="volume-slider">
+                                        <div class="volume-level"></div>
+                                    </div>
+                                </div>
+                                <button class="control-btn" id="fullscreenBtn">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create stars for galaxy background
+        function createStars() {
+            const galaxy = document.getElementById('galaxy');
+            const starsCount = 200;
+
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+
+                // Random properties
+                const size = Math.random() * 3;
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const duration = 2 + Math.random() * 5;
+                const delay = Math.random() * 5;
+
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${left}%`;
+                star.style.top = `${top}%`;
+                star.style.setProperty('--duration', `${duration}s`);
+                star.style.setProperty('--delay', `${delay}s`);
+
+                galaxy.appendChild(star);
+            }
+
+            // Create nebulas
+            for (let i = 0; i < 3; i++) {
+                const nebula = document.createElement('div');
+                nebula.classList.add('nebula');
+
+                // Random properties
+                const left = Math.random() * 70;
+                const top = Math.random() * 70;
+                const duration = 30 + Math.random() * 30;
+
+                nebula.style.left = `${left}%`;
+                nebula.style.top = `${top}%`;
+                nebula.style.animationDuration = `${duration}s`;
+
+                galaxy.appendChild(nebula);
+            }
+        }
+
+        // Initialize sliders
+        function initSliders() {
+            document.querySelectorAll('.slider-container').forEach(container => {
+                const slider = container.querySelector('.slider');
+                const prevBtn = container.querySelector('.prev-btn');
+                const nextBtn = container.querySelector('.next-btn');
+                const cardWidth = 220 + 20; // card width + gap
+                let position = 0;
+
+                prevBtn.addEventListener('click', () => {
+                    position = Math.min(position + cardWidth * 3, 0);
+                    slider.style.transform = `translateX(${position}px)`;
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    const maxPosition = -(cardWidth * (slider.children.length - 4));
+                    position = Math.max(position - cardWidth * 3, maxPosition);
+                    slider.style.transform = `translateX(${position}px)`;
+                });
+            });
+        }
+
+        // Initialize auto slider
+        function initAutoSlider() {
+            const slider = document.getElementById('auto-slider');
+            const slides = slider.children;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                // Remove active class from all slides
+                for (let i = 0; i < slides.length; i++) {
+                    slides[i].classList.remove('active');
+                }
+
+                // Add active class to current slide
+                slides[index].classList.add('active');
+
+                slider.style.transform = `translateX(-${index * 100}%)`;
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            // Auto slide every 5 seconds
+            setInterval(nextSlide, 5000);
+        }
+
+        // Initialize hero slider
+        function initHeroSlider() {
+            const heroSlider = document.querySelector('.hero-slider');
+            const slides = heroSlider.children;
+            let currentSlide = 0;
+
+            // Show the first slide
+            slides[currentSlide].classList.add('active');
+
+            function nextSlide() {
+                // Remove active class from current slide
+                slides[currentSlide].classList.remove('active');
+
+                // Move to next slide
+                currentSlide = (currentSlide + 1) % slides.length;
+
+                // Add active class to new slide
+                slides[currentSlide].classList.add('active');
+            }
+
+            // Auto slide every 5 seconds
+            setInterval(nextSlide, 5000);
+        }
+
+        // Initialize video player
+        function initVideoPlayer() {
+            const videoModal = document.getElementById('videoModal');
+            const playHeroBtn = document.getElementById('play-hero');
+            const closeModal = document.getElementById('closeModal');
+            const video = document.getElementById('player');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const muteBtn = document.getElementById('muteBtn');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const progressBar = document.querySelector('.progress-bar');
+            const progressContainer = document.querySelector('.progress-container');
+            const volumeSlider = document.querySelector('.volume-slider');
+            const volumeLevel = document.querySelector('.volume-level');
+            const currentTimeDisplay = document.getElementById('currentTime');
+            const durationDisplay = document.getElementById('duration');
+
+            // Open modal and play video
+            playHeroBtn.addEventListener('click', () => {
+                videoModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                video.play();
+                updatePlayPauseIcon();
+            });
+
+            // Close modal
+            closeModal.addEventListener('click', () => {
+                videoModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                video.pause();
+            });
+
+            // Close modal when clicking outside
+            videoModal.addEventListener('click', (e) => {
+                if (e.target === videoModal) {
+                    videoModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    video.pause();
+                }
+            });
+
+            // Play/Pause button
+            playPauseBtn.addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
+                updatePlayPauseIcon();
+            });
+
+            // Update play/pause icon
+            function updatePlayPauseIcon() {
+                playPauseBtn.innerHTML = video.paused ?
+                    '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+            }
+
+            // Mute button
+            muteBtn.addEventListener('click', () => {
+                video.muted = !video.muted;
+                muteBtn.innerHTML = video.muted ?
+                    '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+            });
+
+            // Fullscreen button
+            fullscreenBtn.addEventListener('click', () => {
+                if (video.requestFullscreen) {
+                    video.requestFullscreen();
+                } else if (video.webkitRequestFullscreen) {
+                    video.webkitRequestFullscreen();
+                } else if (video.msRequestFullscreen) {
+                    video.msRequestFullscreen();
+                }
+            });
+
+            // Progress bar
+            video.addEventListener('timeupdate', () => {
+                const percent = (video.currentTime / video.duration) * 100;
+                progressBar.style.width = `${percent}%`;
+
+                // Update time display
+                currentTimeDisplay.textContent = formatTime(video.currentTime);
+                if (!isNaN(video.duration)) {
+                    durationDisplay.textContent = formatTime(video.duration);
+                }
+            });
+
+            // Click on progress bar to seek
+            progressContainer.addEventListener('click', (e) => {
+                const pos = (e.pageX - progressContainer.getBoundingClientRect().left) / progressContainer.offsetWidth;
+                video.currentTime = pos * video.duration;
+            });
+
+            // Volume control
+            volumeSlider.addEventListener('click', (e) => {
+                const pos = (e.pageX - volumeSlider.getBoundingClientRect().left) / volumeSlider.offsetWidth;
+                video.volume = pos;
+                volumeLevel.style.width = `${pos * 100}%`;
+
+                // Update mute state if needed
+                if (video.muted && pos > 0) {
+                    video.muted = false;
+                    muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            });
+
+            // Format time as MM:SS
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                seconds = Math.floor(seconds % 60);
+                return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+
+            // Set initial volume level
+            volumeLevel.style.width = `${video.volume * 100}%`;
+        }
+
+        // Watchlist functionality
+        function initWatchlist() {
+            const watchlistBtn = document.getElementById('watchlist-btn');
+            const toast = document.getElementById('toast');
+            let isInWatchlist = false;
+
+            // Check if already in watchlist
+            if (localStorage.getItem('stellar-odyssey-watchlist')) {
+                isInWatchlist = true;
+                updateWatchlistButton();
+            }
+
+            watchlistBtn.addEventListener('click', () => {
+                isInWatchlist = !isInWatchlist;
+                updateWatchlistButton();
+
+                // Store in localStorage
+                if (isInWatchlist) {
+                    localStorage.setItem('stellar-odyssey-watchlist', 'true');
+                    showToast('Added to Watchlist');
+                } else {
+                    localStorage.removeItem('stellar-odyssey-watchlist');
+                    showToast('Removed from Watchlist');
+                }
+            });
+
+            function updateWatchlistButton() {
+                if (isInWatchlist) {
+                    watchlistBtn.innerHTML = '<i class="fas fa-check"></i> Remove from Watchlist';
+                    watchlistBtn.classList.remove('btn-outline');
+                    watchlistBtn.classList.add('btn-watchlist-added');
+                } else {
+                    watchlistBtn.innerHTML = '<i class="fas fa-plus"></i> Add to Watchlist';
+                    watchlistBtn.classList.remove('btn-watchlist-added');
+                    watchlistBtn.classList.add('btn-outline');
+                }
+            }
+
+            function showToast(message) {
+                toast.querySelector('span').textContent = message;
+                toast.classList.add('show');
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            initSliders();
+            initAutoSlider();
+            initHeroSlider();
+            initVideoPlayer();
+            initWatchlist();
+
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('header');
+                if (window.scrollY > 50) {
+                    header.style.background = 'rgba(15, 12, 41, 0.95)';
+                } else {
+                    header.style.background = 'rgba(0, 0, 0, 0.5)';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
